@@ -13,11 +13,13 @@ void NetMonitorDisplay::InitializeAllDisplayTabs()
 	HomeDisplayTab* homeDisplayTab = new HomeDisplayTab();
 	DnsDisplayTab* dnsDisplayTab = new DnsDisplayTab();
 	RawDisplayTab* rawDisplayTab = new RawDisplayTab();
+	ProcessDisplayTab* processDisplayTab = new ProcessDisplayTab();
 
 	// by convention the HOME tab is always first
 	NetMonitorDisplay::displayTabs.push_back(homeDisplayTab);
 	NetMonitorDisplay::displayTabs.push_back(dnsDisplayTab);
 	NetMonitorDisplay::displayTabs.push_back(rawDisplayTab);
+	NetMonitorDisplay::displayTabs.push_back(processDisplayTab);
 }
 
 bool NetMonitorDisplay::GetUserInput()
@@ -162,7 +164,6 @@ void NetMonitorDisplay::UpdateDisplay()
 
 void NetMonitorDisplay::ClearScreenBelowRow(int row, int numScreenRows, int numScreenColumns, WINDOW* window)
 {
-
 	std::string blankLine = "";
 
 	for (int i = 0; i < numScreenColumns; i++)

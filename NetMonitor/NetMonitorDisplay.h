@@ -72,6 +72,22 @@ private:
 	std::string ToDisplayText(IpPacket* packet);
 };
 
+
+class ProcessDisplayTab : public DisplayTab
+{
+public:
+	ProcessDisplayTab();
+	void UpdateTabDisplay(DisplayState* display, NetMonitorState* state) override;
+
+private:
+	std::string ToDisplayText(NetProcInfo* netProcInfo, Connection* connection);
+	std::string ToDisplayText(NetProcInfo* netProcInfo);
+	std::vector<NetstatEntry> GetNetstat();
+	std::vector<ProcessEntry> GetProcesses();
+	ProcessEntry * FindProcess(std::vector<ProcessEntry>* processEntries, std::string PID);
+	std::vector<NetProcInfo>* GetNetProcInfos(std::vector<NetstatEntry>* netstatEntries, std::vector<ProcessEntry>* processEntries);
+};
+
 class NetMonitorDisplay
 {
 public:

@@ -26,14 +26,11 @@ void DnsDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* sta
 	int numScreenColumns = display->numDisplayColumns;
 
 	wattron(window, A_UNDERLINE);
-	std::string dnsHeaderline = " DNSServerIp         RequestId      RecordType     DomainName";
+	std::string dnsHeaderline = " DNSServerIp           RequestId     RecordType     DomainName";
 	mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine(dnsHeaderline, numScreenColumns).c_str());
 	wattrset(window, A_NORMAL);
 
 	currentLine++;
-
-	//(*state).ipv4Connections.SortAllConnections();
-	//(*state).ipv6Connections.SortAllConnections();
 
 	std::vector<DnsData> dnsDatas;
 	dnsDatas.reserve(200);
@@ -75,10 +72,11 @@ std::string DnsDisplayTab::ToDisplayText(DnsData dnsData)
 {
 	std::string displayText;
 
-	displayText += "    ";
+	displayText += "  ";
 	displayText += NetMonitorDisplay::FormatLine(dnsData.resolverAddress, 25);
 	displayText += NetMonitorDisplay::FormatLine(std::to_string(dnsData.requestId), 10);
 	displayText += NetMonitorDisplay::FormatLine(DnsData::ToRecordTypeString(dnsData.recordType), 10);
+	displayText += "   ";
 	displayText += NetMonitorDisplay::FormatLine(dnsData.domainName, 30);
 
 	return displayText;

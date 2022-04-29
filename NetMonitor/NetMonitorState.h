@@ -52,6 +52,37 @@ public:
 	void SortAllConnections();
 };
 
+typedef struct NetProcInfo
+{
+	// 	std::string rawHeaderline = "Name   PID	     State    LocalAddress       DstAddress   PROTO    Rx    Tx";
+	std::string Name;
+	std::string PID;
+	std::string State;
+	std::string LocalAddress;
+	std::string DstAddress;
+	std::string PROTO;
+	std::string RX;
+	std::string TX;
+} NetProcInfo;
+
+typedef struct NetstatEntry
+{
+	std::string Proto;
+	std::string LocalAddress;
+	std::string ForeignAddress;
+	std::string State;
+	std::string PID;
+} NetstatEntry;
+
+typedef struct ProcessEntry
+{
+	std::string ImageName;
+	std::string PID;
+	std::string SessionName;
+	std::string SessionNum;
+	std::string MemUsage;
+} ProcessEntry;
+
 class NetMonitorState
 {
 public:
@@ -69,17 +100,34 @@ State
 
 */
 	NetMonitorState();
+	void Initialize();
 
 	IpConnections ipv4Connections;
 	IpConnections ipv6Connections;
 	std::map<std::string, int> packetVersionHistory;
 	int packetsRead;
+	std::chrono::time_point<std::chrono::system_clock> lastConnectionsSort;
+	std::chrono::time_point<std::chrono::system_clock> lastUIUpdate;
+	std::chrono::time_point<std::chrono::system_clock> lastNetProcUpdate;
 
-	void ProcessPacket(IpPacket *packet);
+
 	std::deque<IpPacket*> recentPackets;
 	std::set<std::string> localInterfaces;
+	std::vector<NetProcInfo> netProcInfos;
+
+	void ProcessPacket(IpPacket* packet);
+	void UpdateNetProcsIfNeeded();
+	void UpdateNetProcs();
+	ProcessEntry* FindProcess(std::vector<ProcessEntry>* processEntries, std::string PID);
+	std::vector<NetProcInfo> GetNetProcInfos(std::vector<NetstatEntry>* netstatEntries, std::vector<ProcessEntry>* processEntries);
+	std::vector<NetstatEntry> GetNetstat();
+	std::vector<ProcessEntry> GetProcesses();
+
+	Connection* FindConnection(TransportProtocol transportProtocol, IPVersion ipVersion, NetworkAddress localNetworkAddress, NetworkAddress remoteNetworkAddress);
+	
 
 private:
 	Connection* FindConnection(IpConnections * ipConnections, IpPacket *packet);
+	std::string GetProcessOutput(std::string commandString);
 };
 

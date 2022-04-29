@@ -22,10 +22,56 @@ public:
 	{
 		this->IpAddress = IpAddress;
 		this->port = port;
-	}
+	};
 
 	std::string IpAddress;
 	int port;
+
+
+	static NetworkAddress ParseNetstatAddressString(std::string networkAddressString, IPVersion ipVersion)
+	{
+		NetworkAddress networkAddress;
+
+		if (networkAddressString == "*.*" || networkAddressString == "*:*")
+			return networkAddress;
+
+		// [2601:602:8d80:4f20::441f]:64639 
+		// 0.0.0.0:445
+
+		PacketStringTokenizer tokenizer = PacketStringTokenizer::PacketStringTokenizer(networkAddressString);
+
+		std::vector<std::string> ipTokens;
+
+		switch (ipVersion)
+		{
+		case (IPVersion::IPv4):
+			ipTokens = tokenizer.GetAllTokens(":");
+			if (ipTokens.size() == 2)
+			{
+				// TODO: handle *.* address
+				networkAddress.IpAddress = ipTokens[0];
+				networkAddress.port = stoi(ipTokens[1]);
+			}
+
+			break;
+			
+		case (IPVersion::IPv6):		
+			ipTokens = tokenizer.GetAllTokens("[]");
+
+			if (ipTokens.size() == 2)
+			{
+				networkAddress.IpAddress = ipTokens[0];
+
+				std::string portString = ipTokens[1].substr(1, ipTokens[1].length());
+				networkAddress.port = stoi(portString);
+			}
+
+			break;
+					
+		}
+
+		return networkAddress;
+	}
 };
 
 // TODO: make IpPacket abstract class

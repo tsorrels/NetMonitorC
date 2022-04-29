@@ -5,6 +5,20 @@
 
 enum class TransportProtocol { UDP, TCP, ICMP, Other };
 
+static TransportProtocol ToTransportProtocol(std::string transportProtocolString)
+{
+	if (transportProtocolString == "TCP")
+		return TransportProtocol::TCP;
+
+	if (transportProtocolString == "UDP")
+		return TransportProtocol::UDP;
+
+	if (transportProtocolString == "ICMP")
+		return TransportProtocol::ICMP;
+
+	return TransportProtocol::Other;
+}
+
 static std::string ToString(TransportProtocol proto)
 {
 	std::string protoString;
@@ -38,6 +52,9 @@ public:
 		SMB,
 		QUIC,
 		RPC,
+		RDP,
+		MSSQL,
+		WINRM,
 		Other
 	};
 
