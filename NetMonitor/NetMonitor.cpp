@@ -52,37 +52,9 @@ int main(int argc, char *argv[])
     cui.pszCaptionText = TEXT("CredUITest");
     cui.hbmBanner = NULL;
 
-    TCHAR pszName[CREDUI_MAX_USERNAME_LENGTH + 1];
-    TCHAR pszPwd[CREDUI_MAX_PASSWORD_LENGTH + 1];
-    SecureZeroMemory(pszName, sizeof(pszName));
-    SecureZeroMemory(pszPwd, sizeof(pszPwd));
 
-    BOOL fSave = FALSE;
-    DWORD dwErr;
-    dwErr = CredUIPromptForCredentials(
-        &cui,                           // CREDUI_INFO structure
-        TEXT("Administrator"),          // Target for credentials
-        NULL,                           // Reserved
-        0,                              // Reason
-        pszName,                        // User name
-        CREDUI_MAX_USERNAME_LENGTH + 1, // Max number of char for user name
-        pszPwd,                         // Password
-        CREDUI_MAX_PASSWORD_LENGTH + 1, // Max number of char for password
-        &fSave,                         // State of save check box
-        CREDUI_FLAGS_GENERIC_CREDENTIALS |  // flags
-        CREDUI_FLAGS_ALWAYS_SHOW_UI |
-        CREDUI_FLAGS_DO_NOT_PERSIST);
-
-    if (dwErr)
-    {
-        SecureZeroMemory(pszName, sizeof(pszName));
-        SecureZeroMemory(pszPwd, sizeof(pszPwd));
-
-        std::cout << "Failed to properly retrieve administrative credentials.\n";
-        return 1;
-    }
-
-     TCHAR cmdLine[] = TEXT("C:\\Windows\\System32\\PktMon.exe start --capture -m real-time");
+    TCHAR cmdLine[] = TEXT("C:\\Windows\\System32\\PktMon.exe start --capture -m real-time");
+    //TCHAR cmdLine[] = TEXT("C:\\PktMon.exe");
     //TCHAR cmdLine[] = TEXT("C:\\Windows\\System32\\NETSTAT.exe");
     TCHAR processDirectory[] = TEXT("c:\\Windows\\System32");
     PROCESS_INFORMATION piProcInfo;
@@ -117,27 +89,26 @@ int main(int argc, char *argv[])
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(pi));
 
-    if (!CreateProcessWithLogonW(
-        pszName,            // pszName,            // lpUsername
-        NULL,               // lpDomain
-        pszPwd,             // pszPwd,             // lpPassword 
-        LOGON_WITH_PROFILE, // dwLogonFlags
-        NULL,               // application name
-        cmdLine,            // command line 
-        0,                  // creation flags 
-        NULL,               // use parent's environment 
-        processDirectory,   // process directory
+    HANDLE securityToken;
+    OpenProcessToken(GetCurrentProcess(), MAXIMUM_ALLOWED, &securityToken);
+
+    if (!CreateProcessAsUser(
+        securityToken,
+        NULL,
+        cmdLine, 
+        NULL, 
+        NULL, 
+        TRUE,
+        0, 
+        NULL, 
+        NULL, 
         &siStartInfo,       // STARTUPINFO pointer 
         &pi))               // receives PROCESS_INFORMATION 
     {
         int error = GetLastError();
-        SecureZeroMemory(pszName, sizeof(pszName));
-        SecureZeroMemory(pszPwd, sizeof(pszPwd));
-        return 1;
+        std::cout << error;
+        return error;
     }
-
-    SecureZeroMemory(pszName, sizeof(pszName));
-    SecureZeroMemory(pszPwd, sizeof(pszPwd));
 
     childProcess = pi.hProcess;
 
