@@ -42,18 +42,18 @@ void NetMonitorState::ProcessPacket(IpPacket *packet)
 	// find if there is already a connection
 	Connection * connection = NULL;
 
-	switch (packet->ipVersion)
-	{
-	case IPVersion::IPv4:
-		connection = FindConnection(&ipv4Connections, packet);
-		break;
-	case IPVersion::IPv6:
-		connection = FindConnection(&ipv6Connections, packet);
-		break;
-	default:
-		// don't do anything
-		return;		
-	}
+	//switch (packet->ipVersion)
+	//{
+	//case IPVersion::IPv4:
+		connection = FindConnection(&ipConnections, packet);
+	//	break;
+	//case IPVersion::IPv6:
+	//	connection = FindConnection(&ipv6Connections, packet);
+	//	break;
+	//default:
+	//	// don't do anything
+	//	return;		
+	//}
 
 	// if connection exists, update it
 	if (connection != NULL)
@@ -68,18 +68,7 @@ void NetMonitorState::ProcessPacket(IpPacket *packet)
 
 		IpConnections* ipConnectionsPtr = NULL;
 		
-		switch (packet->ipVersion)
-		{
-		case IPVersion::IPv4:
-			ipConnectionsPtr = &ipv4Connections;
-			break;
-		case IPVersion::IPv6:
-			ipConnectionsPtr = &ipv6Connections;
-			break;
-		default:
-			// don't do anything
-			return;
-		}
+			ipConnectionsPtr = &ipConnections;
 
 		std::vector<Connection>* connectionsPtr = NULL;
 		switch (packet->transportProtocol)
@@ -97,8 +86,6 @@ void NetMonitorState::ProcessPacket(IpPacket *packet)
 			// don't do anything
 			return;
 		}
-
-		std::vector<Connection>* ipv4connectionsptr = &(ipv4Connections.tcpConnections);
 
 		// add connection to state
 		(*connectionsPtr).push_back(newConnection);
@@ -120,18 +107,9 @@ void NetMonitorState::ProcessPacket(IpPacket *packet)
 Connection* NetMonitorState::FindConnection(TransportProtocol transportProtocol, IPVersion ipVersion, NetworkAddress localNetworkAddress, NetworkAddress remoteNetworkAddress)
 {
 	IpConnections* ipConnections = NULL;
+	
+		ipConnections = &(NetMonitorState::ipConnections);
 
-	switch (ipVersion)
-	{
-	case (IPVersion::IPv4):		
-		ipConnections = &(NetMonitorState::ipv4Connections);
-			break;
-	case (IPVersion::IPv6):
-		ipConnections = &(NetMonitorState::ipv6Connections);
-		break;
-	default:
-		return NULL;
-	}
 
 	 std::vector<Connection>* connections = NULL;
 	switch (transportProtocol)

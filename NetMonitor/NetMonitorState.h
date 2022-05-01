@@ -27,6 +27,7 @@ public:
 	TransportProtocol transportProtocol;
 	Protocol::ProtoEnum protocol;
 	std::string data;
+	IPVersion ipVersion;
 
 	// for unit testing
 	Connection()
@@ -102,8 +103,8 @@ State
 	NetMonitorState();
 	void Initialize();
 
-	IpConnections ipv4Connections;
-	IpConnections ipv6Connections;
+	IpConnections ipConnections;
+	// IpConnections ipv6Connections;
 	std::map<std::string, int> packetVersionHistory;
 
 	int packetsRead;

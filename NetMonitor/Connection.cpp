@@ -2,6 +2,8 @@
 
 Connection::Connection(IpPacket* packet)
 {
+	ipVersion = packet->ipVersion;
+
 	localNetworkAddress = packet->GetLocalNetworkAddress();
 	remoteNetworkAddress = packet->GetRemoteNetworkAddress();
 

@@ -32,39 +32,19 @@ void HomeDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* st
 	wattrset(window, A_NORMAL);
 	currentLine++;
 
-	(*state).ipv4Connections.SortAllConnections();
-	(*state).ipv6Connections.SortAllConnections();
-
-	// ipv4 connections 
-	mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine("IPV4", numScreenColumns).c_str());
-	currentLine++;
+	(*state).ipConnections.SortAllConnections();
 
 	mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine("  UDP", numScreenColumns).c_str());
 	currentLine++;
-	UpdateDisplayConnections((*state).ipv4Connections.udpConnections, MaxConnectionsToDisplay, numScreenColumns, &currentLine, display->window);
+	UpdateDisplayConnections((*state).ipConnections.udpConnections, MaxConnectionsToDisplay, numScreenColumns, &currentLine, display->window);
 
 	mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine("  TCP", numScreenColumns).c_str());
 	currentLine++;
-	UpdateDisplayConnections((*state).ipv4Connections.tcpConnections, MaxConnectionsToDisplay, numScreenColumns, &currentLine, display->window);
+	UpdateDisplayConnections((*state).ipConnections.tcpConnections, MaxConnectionsToDisplay, numScreenColumns, &currentLine, display->window);
 
 	mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine("  ICMP", numScreenColumns).c_str());
 	currentLine++;
-	UpdateDisplayConnections((*state).ipv4Connections.icmpConnections, MaxConnectionsToDisplay, numScreenColumns, &currentLine, display->window);
-
-	mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine("IPV6", numScreenColumns).c_str());
-	currentLine++;
-
-	mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine("  UDP", numScreenColumns).c_str());
-	currentLine++;
-	UpdateDisplayConnections((*state).ipv6Connections.udpConnections, MaxConnectionsToDisplay, numScreenColumns, &currentLine, display->window);
-
-	mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine("  TCP", numScreenColumns).c_str());
-	currentLine++;
-	UpdateDisplayConnections((*state).ipv6Connections.tcpConnections, MaxConnectionsToDisplay, numScreenColumns, &currentLine, display->window);
-
-	mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine("  ICMP", numScreenColumns).c_str());
-	currentLine++;
-	HomeDisplayTab::UpdateDisplayConnections((*state).ipv6Connections.icmpConnections, MaxConnectionsToDisplay, numScreenColumns, &currentLine, display->window);
+	UpdateDisplayConnections((*state).ipConnections.icmpConnections, MaxConnectionsToDisplay, numScreenColumns, &currentLine, display->window);
 
 	NetMonitorDisplay::ClearScreenBelowRow(currentLine, display->numDisplayLines, display->numDisplayColumns, display->window);
 }
@@ -121,19 +101,12 @@ void HomeDisplayTab::UpdateDisplayConnections(std::vector<Connection> connection
 
 		std::string displayLine = HomeDisplayTab::ToDisplayText(*connection);
 
-		//if (DisplayTab::DisplayLinePassesFilter(displayLine, state->filterString))
-		//{
-
-
-
 			HomeDisplayTab::ToggleBold(*connection, window);
 			mvwaddstr(window, *currentLine, 0, NetMonitorDisplay::FormatLine(displayLine, numColumns).c_str());
 			(*currentLine)++;
 
-		//}
 
 		wattrset(window, 0);
-		// int wattrset(WINDOW *win, chtype attrs);
 	}
 }
 

@@ -35,9 +35,9 @@ void DnsDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* sta
 	std::vector<DnsData> dnsDatas;
 	dnsDatas.reserve(200);
 
-	for (int i = 0; i < state->ipv4Connections.udpConnections.size(); i++)
+	for (int i = 0; i < state->ipConnections.udpConnections.size(); i++)
 	{
-		Connection* connection = &(state->ipv4Connections.udpConnections[i]);
+		Connection* connection = &(state->ipConnections.udpConnections[i]);
 		if (connection->protocol != Protocol::ProtoEnum::DNS)
 			continue;
 
@@ -45,15 +45,15 @@ void DnsDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* sta
 		dnsDatas.insert(dnsDatas.end(), dnsDataObjects.begin(), dnsDataObjects.end());
 	}
 
-	for (int i = 0; i < state->ipv6Connections.udpConnections.size(); i++)
-	{
-		Connection* connection = &(state->ipv6Connections.udpConnections[i]);
-		if (connection->protocol != Protocol::ProtoEnum::DNS)
-			continue;
+	//for (int i = 0; i < state->ipv6Connections.udpConnections.size(); i++)
+	//{
+	//	Connection* connection = &(state->ipv6Connections.udpConnections[i]);
+	//	if (connection->protocol != Protocol::ProtoEnum::DNS)
+	//		continue;
 
-		std::vector<DnsData> dnsDataObjects = DnsData::FromMultipleDataString(connection->data);
-		dnsDatas.insert(dnsDatas.end(), dnsDataObjects.begin(), dnsDataObjects.end());
-	}
+	//	std::vector<DnsData> dnsDataObjects = DnsData::FromMultipleDataString(connection->data);
+	//	dnsDatas.insert(dnsDatas.end(), dnsDataObjects.begin(), dnsDataObjects.end());
+	//}
 
 	std::sort(dnsDatas.begin(), dnsDatas.end(), DnsData::CompareDnsData);
 
@@ -61,11 +61,11 @@ void DnsDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* sta
 	{
 		auto dnsDataObject = dnsDatas[j];
 		std::string dnsConnectionLine = ToDisplayText(dnsDataObject);
-		//if (DisplayTab::DisplayLinePassesFilter(dnsConnectionLine, state->filterString))
-		//{
+		if (DisplayTab::DisplayLinePassesFilter(dnsConnectionLine, state->filterString))
+		{
 			mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine(dnsConnectionLine, numScreenColumns).c_str());
 			currentLine++;
-		//}
+		}
 	}
 
 	NetMonitorDisplay::ClearScreenBelowRow(currentLine, display->numDisplayLines, display->numDisplayColumns, display->window);
