@@ -8,7 +8,7 @@
 #include "../Dependencies/pdcurses/curses.h"
 
 const char headerLine1[] = "netmonitor.exe 0.9.0";
-const char headerLine2[] = "press '->' '<-' to change view, or 'q' to exit";
+const char headerLine2[] = "Press ESC to exit";
 
 
 enum class LineJustified
@@ -35,6 +35,7 @@ public:
 	// 0 = first tab, 1 = second tab, etc.
 	int TabIndex;
 	std::string TabName;
+	virtual bool DisplayLinePassesFilter(std::string displayString, std::string filterString);
 	virtual void UpdateTabDisplay(DisplayState* display, NetMonitorState* state) = 0;
 };
 
@@ -115,4 +116,6 @@ private:
 	void SetTabTextAttr(bool isPrimaryTab);
 	void ClearTextAttr();
 
+	void ProcessValidFilterInput(int input);
+	void ProcessBackspace();
 };

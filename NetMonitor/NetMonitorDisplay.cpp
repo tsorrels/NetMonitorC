@@ -32,6 +32,10 @@ bool NetMonitorDisplay::GetUserInput()
 
 	switch (input)
 	{
+	case -1:
+		// no input to handle
+		break;
+
 	case KEY_LEFT:
 		if (currentTabIndex != 0)
 			NetMonitorDisplay::currentTab = NetMonitorDisplay::displayTabs[currentTabIndex - 1];
@@ -44,18 +48,44 @@ bool NetMonitorDisplay::GetUserInput()
 
 		break;
 
-	case 'q':
+	// KEY_BACKSPACE
+	case '\b':		
+		NetMonitorDisplay::ProcessBackspace();
+		break;
+
+	// KEY_ESC
+	case 27: 
 		terminate = true;
 		break;
 
 	// TODO: handle term_resize input
-
 	default:
+		char inputChar = input;
+
+		if (input >= 0 && input <= 255 && isprint(input))
+		{
+			ProcessValidFilterInput(input);
+		}
+
 		break;
-		// nothing
 	}
 
 	return terminate;
+}
+
+void NetMonitorDisplay::ProcessBackspace()
+{
+	if (NetMonitorDisplay::state->filterString.size() > 0)
+	{
+		std::string currentString = NetMonitorDisplay::state->filterString;
+		auto currentStringLength = currentString.length();
+		NetMonitorDisplay::state->filterString = currentString.substr(0, currentStringLength - 1);
+	}
+}
+
+void NetMonitorDisplay::ProcessValidFilterInput(int input)
+{
+	NetMonitorDisplay::state->filterString += input;
 }
 
 NetMonitorDisplay::NetMonitorDisplay(WINDOW* window, NetMonitorState* state)
@@ -149,7 +179,10 @@ void NetMonitorDisplay::UpdateDisplay()
 	NetMonitorDisplay::display.numDisplayLines = LINES;
 	NetMonitorDisplay::display.numDisplayColumns = COLS;
 
+	std::string filterString = "FILTER:" + state->filterString;
 	std::string packetsReadString = "Packets read: " + std::to_string(NetMonitorDisplay::state->packetsRead);
+	packetsReadString += "          ";
+	packetsReadString += filterString;
 
 	mvwaddstr(NetMonitorDisplay::display.window, 3, 0, NetMonitorDisplay::FormatLine(packetsReadString, NetMonitorDisplay::display.numDisplayColumns).c_str());
 	

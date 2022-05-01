@@ -33,9 +33,14 @@ void RawDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* sta
 	for (int i = 0; i < state->recentPackets.size() && i < PACKETSTODISPLAY; i++)
 	{
 		IpPacket* packet = (state->recentPackets[i]);
+
 		std::string packetString = RawDisplayTab::ToDisplayText(packet);
-		mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine(packetString, numScreenColumns).c_str());
-		currentLine++;
+
+		if (DisplayTab::DisplayLinePassesFilter(packetString, state->filterString))
+		{
+			mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine(packetString, numScreenColumns).c_str());
+			currentLine++;
+		}
 	}
 
 	NetMonitorDisplay::ClearScreenBelowRow(currentLine, display->numDisplayLines, display->numDisplayColumns, display->window);

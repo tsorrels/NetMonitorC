@@ -68,8 +68,11 @@ void ProcessDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState*
 			netProcString = ProcessDisplayTab::ToDisplayText(netProcInfo);
 		}
 
-		mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine(netProcString, numScreenColumns).c_str());
-		currentLine++;
+		if (DisplayTab::DisplayLinePassesFilter(netProcString, state->filterString))
+		{
+			mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine(netProcString, numScreenColumns).c_str());
+			currentLine++;
+		}
 	}
 
 	NetMonitorDisplay::ClearScreenBelowRow(currentLine, display->numDisplayLines, display->numDisplayColumns, display->window);

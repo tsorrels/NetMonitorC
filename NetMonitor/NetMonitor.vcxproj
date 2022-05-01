@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Connection.cpp" />
+    <ClCompile Include="DisplayTab.cpp" />
     <ClCompile Include="DnsData.cpp" />
     <ClCompile Include="DnsDisplayTab.cpp" />
     <ClCompile Include="HomeDisplayTab.cpp" />

@@ -17,13 +17,12 @@ void Exit()
     TerminateProcess(childProcess, 0);
 
     // cleanup first
-
     if (window != NULL)
     {
         endwin();
     }
 
-    ShellExecuteA(NULL, NULL, "C:\\Windows\\System32\\PktMon.exe", "PktMon stop", NULL, SW_RESTORE);
+    ShellExecuteA(NULL, NULL, "C:\\Windows\\System32\\PktMon.exe", "stop", NULL, SW_RESTORE);
 
     ExitProcess(0);
 }
@@ -54,8 +53,6 @@ int main(int argc, char *argv[])
 
 
     TCHAR cmdLine[] = TEXT("C:\\Windows\\System32\\PktMon.exe start --capture -m real-time");
-    //TCHAR cmdLine[] = TEXT("C:\\PktMon.exe");
-    //TCHAR cmdLine[] = TEXT("C:\\Windows\\System32\\NETSTAT.exe");
     TCHAR processDirectory[] = TEXT("c:\\Windows\\System32");
     PROCESS_INFORMATION piProcInfo;
     STARTUPINFO siStartInfo;

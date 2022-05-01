@@ -105,7 +105,10 @@ State
 	IpConnections ipv4Connections;
 	IpConnections ipv6Connections;
 	std::map<std::string, int> packetVersionHistory;
+
 	int packetsRead;
+	std::string filterString;
+
 	std::chrono::time_point<std::chrono::system_clock> lastConnectionsSort;
 	std::chrono::time_point<std::chrono::system_clock> lastUIUpdate;
 	std::chrono::time_point<std::chrono::system_clock> lastNetProcUpdate;

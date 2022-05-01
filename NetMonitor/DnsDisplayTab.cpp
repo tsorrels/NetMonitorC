@@ -61,8 +61,11 @@ void DnsDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* sta
 	{
 		auto dnsDataObject = dnsDatas[j];
 		std::string dnsConnectionLine = ToDisplayText(dnsDataObject);
-		mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine(dnsConnectionLine, numScreenColumns).c_str());
-		currentLine++;
+		//if (DisplayTab::DisplayLinePassesFilter(dnsConnectionLine, state->filterString))
+		//{
+			mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine(dnsConnectionLine, numScreenColumns).c_str());
+			currentLine++;
+		//}
 	}
 
 	NetMonitorDisplay::ClearScreenBelowRow(currentLine, display->numDisplayLines, display->numDisplayColumns, display->window);

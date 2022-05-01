@@ -116,9 +116,21 @@ void HomeDisplayTab::UpdateDisplayConnections(std::vector<Connection> connection
 		// turn on bold
 
 		Connection* connection = &(connections[i]);
-		HomeDisplayTab::ToggleBold(*connection, window);
-		mvwaddstr(window, *currentLine, 0, NetMonitorDisplay::FormatLine(HomeDisplayTab::ToDisplayText(*connection), numColumns).c_str());
-		(*currentLine)++;
+
+
+
+		std::string displayLine = HomeDisplayTab::ToDisplayText(*connection);
+
+		//if (DisplayTab::DisplayLinePassesFilter(displayLine, state->filterString))
+		//{
+
+
+
+			HomeDisplayTab::ToggleBold(*connection, window);
+			mvwaddstr(window, *currentLine, 0, NetMonitorDisplay::FormatLine(displayLine, numColumns).c_str());
+			(*currentLine)++;
+
+		//}
 
 		wattrset(window, 0);
 		// int wattrset(WINDOW *win, chtype attrs);
