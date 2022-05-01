@@ -95,7 +95,7 @@ NetMonitorDisplay::NetMonitorDisplay(WINDOW* window, NetMonitorState* state)
 	NetMonitorDisplay::state = state;
 
 	mvwaddstr(NetMonitorDisplay::display.window, 0, 0, headerLine1);
-	mvwaddstr(NetMonitorDisplay::display.window, 1, 0, headerLine2);
+	//mvwaddstr(NetMonitorDisplay::display.window, 1, 0, headerLine2);
 
 	InitializeAllDisplayTabs();
 
@@ -179,12 +179,16 @@ void NetMonitorDisplay::UpdateDisplay()
 	NetMonitorDisplay::display.numDisplayLines = LINES;
 	NetMonitorDisplay::display.numDisplayColumns = COLS;
 
-	std::string filterString = "FILTER:" + state->filterString;
 	std::string packetsReadString = "Packets read: " + std::to_string(NetMonitorDisplay::state->packetsRead);
-	packetsReadString += "          ";
-	packetsReadString += filterString;
+	mvwaddstr(NetMonitorDisplay::display.window, 2, 0, NetMonitorDisplay::FormatLine(packetsReadString, NetMonitorDisplay::display.numDisplayColumns).c_str());
 
-	mvwaddstr(NetMonitorDisplay::display.window, 3, 0, NetMonitorDisplay::FormatLine(packetsReadString, NetMonitorDisplay::display.numDisplayColumns).c_str());
+
+	int lengthOfFilter = 7;
+	wattrset(NetMonitorDisplay::display.window, A_STANDOUT);
+	mvwaddstr(NetMonitorDisplay::display.window, 3, 0, "FILTER:");
+	ClearTextAttr();
+	std::string filterString = state->filterString;
+	mvwaddstr(NetMonitorDisplay::display.window, 3, lengthOfFilter, NetMonitorDisplay::FormatLine(filterString, NetMonitorDisplay::display.numDisplayColumns).c_str());
 	
 	AddTabLinesToDisplay();
 

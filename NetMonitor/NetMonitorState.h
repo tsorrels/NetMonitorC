@@ -104,7 +104,6 @@ State
 	void Initialize();
 
 	IpConnections ipConnections;
-	// IpConnections ipv6Connections;
 	std::map<std::string, int> packetVersionHistory;
 
 	int packetsRead;

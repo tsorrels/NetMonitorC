@@ -7,9 +7,7 @@
 #include "DnsPacket.h";
 #include "../Dependencies/pdcurses/curses.h"
 
-const char headerLine1[] = "netmonitor.exe 0.9.0";
-const char headerLine2[] = "Press ESC to exit";
-
+const char headerLine1[] = "netmonitor.exe 0.9.0        Press 'ESC' to exit";
 
 enum class LineJustified
 {
