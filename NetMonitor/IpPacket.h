@@ -2,14 +2,10 @@
 
 #include "PacketStringTokenizer.h"
 #include "Protocol.h"
+#include "NetMonitorEnums.h"
 #include <string>
 #include <vector>
 
-enum class IPVersion {IPv4 = 4, IPv6 = 6, Other = 0};
-
-enum class Direction {Rx, Tx, Other};
-
-enum class PacketType {Ethernet, Other};
 
 class NetworkAddress
 {

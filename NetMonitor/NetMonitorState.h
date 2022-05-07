@@ -9,6 +9,7 @@
 #include <map>
 #include <deque>
 #include <set>
+#include <Windows.h>
 #include "Protocol.h"
 #include "IpPacket.h"
 #include "TcpPacket.h"
@@ -22,6 +23,8 @@ public:
 	NetworkAddress remoteNetworkAddress;
 	int txBytes;
 	int rxBytes;
+	double rxRate;
+	double txRate;
 	std::chrono::time_point<std::chrono::system_clock> lastRx;
 	std::chrono::time_point<std::chrono::system_clock> lastTx;
 	TransportProtocol transportProtocol;
@@ -37,17 +40,19 @@ public:
 	Connection(IpPacket* packet);
 	void UpdateConnection(IpPacket* packet);
 	std::string Serialize();
+	double Getkbs(std::chrono::time_point<std::chrono::system_clock> lastRx, int packetLength);
+	bool IsActive();
 
 private:		
-	void AddBytes(IpPacket packet);
+	void UpdateBytes(IpPacket packet);
 };
 
 class IpConnections
 {
 public:
-	std::vector<Connection> udpConnections;
-	std::vector<Connection> tcpConnections;
-	std::vector<Connection> icmpConnections;
+	std::vector<Connection> allConnections;
+	//std::vector<Connection> tcpConnections;
+	//std::vector<Connection> icmpConnections;
 
 	void SortConnections(TransportProtocol transportProtocol);
 	void SortAllConnections();
@@ -100,9 +105,12 @@ State
    |_icmp6Connections[]
 
 */
-	NetMonitorState();
 	void Initialize();
 
+	// Not Used
+	std::set<std::string> localInterfaces;
+
+	HANDLE connectionsProcInfosMutex;
 	IpConnections ipConnections;
 	std::map<std::string, int> packetVersionHistory;
 
@@ -113,9 +121,10 @@ State
 	std::chrono::time_point<std::chrono::system_clock> lastUIUpdate;
 	std::chrono::time_point<std::chrono::system_clock> lastNetProcUpdate;
 
-
+	HANDLE recentPacketsMutex;
 	std::deque<IpPacket*> recentPackets;
-	std::set<std::string> localInterfaces;
+
+	HANDLE netProcInfosMutex;
 	std::vector<NetProcInfo> netProcInfos;
 
 	void ProcessPacket(IpPacket* packet);

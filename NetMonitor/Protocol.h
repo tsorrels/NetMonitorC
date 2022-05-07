@@ -2,8 +2,9 @@
 
 #include <string>
 #include <map>
+#include "NetMonitorEnums.h"
 
-enum class TransportProtocol { UDP, TCP, ICMP, Other };
+
 
 static TransportProtocol ToTransportProtocol(std::string transportProtocolString)
 {

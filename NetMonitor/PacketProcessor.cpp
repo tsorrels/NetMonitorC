@@ -7,14 +7,11 @@
 #include "PacketFactory.h"
 #include "PacketStringTokenizer.h"
 
-
 #include "IcmpPacket.h"
 #include "UdpPacket.h"
 #include "TcpPacket.h"
 
-
 #define NUMBYTESTOREAD 4096
-
 
 PacketProcessor::PacketProcessor(HANDLE fileDescriptor)
 {
@@ -81,15 +78,11 @@ IpPacket * PacketProcessor::GetNextPacket()
     IpPacket* packetPtr = NULL;
     while (packetPtr == NULL)
     {
-
         std::string infoString = GetNextInfoString();
 
         PacketStringTokenizer infoStringTokenizer = PacketStringTokenizer::PacketStringTokenizer(infoString);
 
-        // IpPacket packet;
-
         // parse info string
-        // std::vector<std::string> infoTokens = TokenizeInfoString(infoString);
         std::vector<std::string> infoTokens = infoStringTokenizer.GetAllTokens(" ,");
 
         // process tokens
@@ -110,8 +103,6 @@ IpPacket * PacketProcessor::GetNextPacket()
 
     return packetPtr;
 }
-
-
 
 std::string PacketProcessor::GetNextInfoString()
 {
@@ -214,174 +205,24 @@ char PacketProcessor::PeekNextChar()
  */
 void PacketProcessor::ReadFromPktMon()
 {
-    //std::string completeString = "";
-
     BOOL readSuccess;
     DWORD bytesRead;
     int totalBytesRead = 0;
 
-    //while (completeString.length() < NUMBYTESTOREAD)
-    //{
-    //    // read up to one byte less than available space in buffer
-    //    // leave one byte for a null terminator to tern it into a string
-    //    int numBytesToRead = BUFSIZE - totalBytesRead - 1;
+	// each call to read will begin writing data at beginning of readBuffer
+	readSuccess = ReadFile(PacketProcessor::fileDescriptor, PacketProcessor::pktmonBuffer, NUMBYTESTOREAD, &bytesRead, NULL);
 
-        // each call to read will begin writing data at beginning of readBuffer
-        readSuccess = ReadFile(PacketProcessor::fileDescriptor, PacketProcessor::pktmonBuffer, NUMBYTESTOREAD, &bytesRead, NULL);
+	if (!readSuccess)
+	{
+		int error = GetLastError();
+		// break;
+	}
 
-        if (!readSuccess)
-        {
-            int error = GetLastError();
-            // break;
-        }
+	if (bytesRead == 0)
+	{
+		// handle EOF
+	}
 
-        if (bytesRead == 0)
-        {
-            // handle EOF
-        }
-
-        PacketProcessor::numBytesInBuffer = bytesRead;
-        PacketProcessor::bufferOffset = 0;
-
-        //totalBytesRead += bytesRead;
-
-        //// there will be at least one byte at the end of the buffer
-        //pktmonBuffer[bytesRead] = '\0';
-
-        //// term into string
-        //std::string tempString = std::string(pktmonBuffer);
-
-        //completeString += tempString;
-    //}
+	PacketProcessor::numBytesInBuffer = bytesRead;
+	PacketProcessor::bufferOffset = 0;
 }
-
-
-
-// not used
-std::vector<std::string> TokenizeInfoString(std::string packetString)
-{
-    PacketStringTokenizer tokenizer = PacketStringTokenizer::PacketStringTokenizer(packetString);
-
-    // info string is in following format
-    // 16:30:50.127593800 PktGroupId 1407374883558202, PktNumber 1, Appearance 1, Direction Tx , Type Ethernet , Component 494, Edge 1, Filter 2, OriginalSize 55, LoggedSize 55
-
-    std::string timeStamp = tokenizer.GetNextToken(' ');
-
-    // eat 'PktGroupId'
-    tokenizer.GetNextToken(' ');
-
-    std::string pktGroupId = tokenizer.GetNextToken(',');
-
-    // eat ' '
-    tokenizer.GetNextToken(' ');
-
-    // eat PktNumber 
-    tokenizer.GetNextToken(' ');
-
-    std::string pktNumber = tokenizer.GetNextToken(',');
-
-    // eat ' '
-    tokenizer.GetNextToken(' ');
-
-    // eat Appearance 
-    tokenizer.GetNextToken(' ');
-
-    std::string appearance = tokenizer.GetNextToken(',');
-
-    // eat ' '
-    tokenizer.GetNextToken(' ');
-
-    // eat Appearance 
-    tokenizer.GetNextToken(' ');
-
-    std::string direction = tokenizer.GetNextToken(' ');
-
-    // eat ','
-    tokenizer.GetNextToken(',');
-
-    // eat ' '
-    tokenizer.GetNextToken(' ');
-
-    // eat Type 
-    tokenizer.GetNextToken(' ');
-
-    std::string type = tokenizer.GetNextToken(' ');
-
-    // eat ' '
-    tokenizer.GetNextToken(' ');
-
-    // eat ','
-    tokenizer.GetNextToken(',');
-
-    // eat ' '
-    tokenizer.GetNextToken(' ');
-
-    // eat 'Component'
-    tokenizer.GetNextToken(' ');
-
-    std::string component = tokenizer.GetNextToken(',');
-
-    // eat ' '
-    tokenizer.GetNextToken(' ');
-
-    // eat 'Edge'
-    tokenizer.GetNextToken(' ');
-
-    std::string edge = tokenizer.GetNextToken(',');
-
-    // eat ' '
-    tokenizer.GetNextToken(' ');
-
-    // eat 'Filter'
-    tokenizer.GetNextToken(' ');
-
-    std::string filter = tokenizer.GetNextToken(',');
-
-    // eat ' '
-    tokenizer.GetNextToken(' ');
-
-    // eat 'OriginalSize'
-    tokenizer.GetNextToken(' ');
-
-    std::string originalSize = tokenizer.GetNextToken(',');
-
-    // eat ' '
-    tokenizer.GetNextToken(' ');
-
-    // eat 'LoggedSize'
-    tokenizer.GetNextToken(' ');
-
-    std::string loggedSize = tokenizer.GetNextToken('\0');
-
-    // useless right now
-    return std::vector<std::string>();
-}
-
-// not used
-//std::vector<std::string> TokenizeString(std::string packetString)
-//{
-//    // remove whitespace
-//    // packetString.erase(std::remove_if(packetString.begin(), packetString.end(), IsSpace), packetString.end());
-//
-//    // tokanize
-//    std::vector<std::string> tokens;
-//    int delimiterLength = 1;
-//    std::string delimiters = " ,";
-//    int position = 0;
-//    std::string token;
-//    std::string workingString = packetString;
-//
-//    while ((position = workingString.find_first_of(delimiters)) != std::string::npos) 
-//    {
-//        token = workingString.substr(0, position);
-//
-//        if (token != " " && token != ",")
-//        {
-//            tokens.push_back(token);
-//        }       
-//
-//        workingString = workingString.erase(0, position + delimiterLength);
-//    }
-//
-//    return tokens;
-//}

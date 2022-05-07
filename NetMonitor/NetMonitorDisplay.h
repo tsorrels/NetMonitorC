@@ -49,6 +49,7 @@ private:
 
 	std::string GetTransmitString(Connection connection);
 	void ToggleBold(Connection connection, WINDOW* window);
+	std::string GetRateBar(Connection connection);
 };
 
 class DnsDisplayTab : public DisplayTab

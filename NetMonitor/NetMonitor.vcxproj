@@ -149,6 +149,8 @@
     <ClCompile Include="IcmpPacket.cpp" />
     <ClCompile Include="NetMonitor.cpp" />
     <ClCompile Include="NetMonitorDisplay.cpp" />
+    <ClCompile Include="NetMonitorEnums.cpp" />
+    <ClCompile Include="NetMonitorProcessor.cpp" />
     <ClCompile Include="NetMonitorState.cpp" />
     <ClCompile Include="NetworkAddress.cpp" />
     <ClCompile Include="PacketFactory.cpp" />
@@ -163,6 +165,8 @@
     <ClInclude Include="DnsPacket.h" />
     <ClInclude Include="IcmpPacket.h" />
     <ClInclude Include="NetMonitorDisplay.h" />
+    <ClInclude Include="NetMonitorEnums.h" />
+    <ClInclude Include="NetMonitorProcessor.h" />
     <ClInclude Include="NetMonitorState.h" />
     <ClInclude Include="IpPacket.h" />
     <ClInclude Include="PacketFactory.h" />

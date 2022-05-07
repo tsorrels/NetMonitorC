@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "PacketProcessor.h";
+#include "NetMonitorProcessor.h";
 #include "NetMonitorState.h";
 #include "NetMonitorDisplay.h";
 #include "../Dependencies/pdcurses/curses.h"
@@ -12,7 +13,7 @@
 HANDLE childProcess;
 WINDOW* window;
 
-void Exit()
+void Exit(int error)
 {
     TerminateProcess(childProcess, 0);
 
@@ -24,17 +25,26 @@ void Exit()
 
     ShellExecuteA(NULL, NULL, "C:\\Windows\\System32\\PktMon.exe", "stop", NULL, SW_RESTORE);
 
-    ExitProcess(0);
+    ExitProcess(error);
 }
 
 BOOL WINAPI consoleHandler(DWORD signal) {
 
     if (signal == CTRL_C_EVENT)
     {
-        Exit();
+        Exit(0);
     }
 
     return TRUE;
+}
+
+DWORD WINAPI ProcessCapture(LPVOID lpParam)
+{
+    NetMonitorProcessor* netMonitorProcessor = (NetMonitorProcessor*)lpParam;
+
+    // run forever, must be terminated by main thread
+    netMonitorProcessor->Run();
+    return 0;
 }
 
 int main(int argc, char *argv[])
@@ -43,14 +53,6 @@ int main(int argc, char *argv[])
         printf("\nERROR: Could not set control handler");
         return 1;
     }
-
-    CREDUI_INFO cui;
-    cui.cbSize = sizeof(CREDUI_INFO);
-    cui.hwndParent = NULL;
-    cui.pszMessageText = TEXT("Enter administrator account information");
-    cui.pszCaptionText = TEXT("CredUITest");
-    cui.hbmBanner = NULL;
-
 
     TCHAR cmdLine[] = TEXT("C:\\Windows\\System32\\PktMon.exe start --capture -m real-time");
     TCHAR processDirectory[] = TEXT("c:\\Windows\\System32");
@@ -128,20 +130,42 @@ int main(int argc, char *argv[])
         keypad(window, true);
 
         NetMonitorState state = NetMonitorState();
+        state.Initialize();
 
         NetMonitorDisplay display = NetMonitorDisplay::NetMonitorDisplay(window, &state);    
+        NetMonitorProcessor netMonitorProcessor = NetMonitorProcessor(&packetProcessor, &state);
+
+        DWORD threadId;
+        HANDLE PacketCaptureProcessThread = CreateThread(
+            NULL,                   // default security attributes
+            0,                      // use default stack size  
+            ProcessCapture,       // thread function name
+            &netMonitorProcessor,          // argument to thread function 
+            0,                      // use default creation flags 
+            &threadId);   // returns the thread identifier
+
+        if (PacketCaptureProcessThread == NULL)
+        {
+            std::cout << "Failed creating PacketCaptureProcessThread, exiting.";
+            Exit(3);
+        }
+
+        std::cout << "ChildThreadId = " << threadId;
 
         while (true)
         {
-            IpPacket * packet = packetProcessor.GetNextPacket();
+            //IpPacket * packet = packetProcessor.GetNextPacket();
 
-            state.ProcessPacket(packet);
-            state.UpdateNetProcsIfNeeded();
+            //state.ProcessPacket(packet);
+            //state.UpdateNetProcsIfNeeded();
 
             // TODO: only update dislay every 100 ms
             bool terminate = display.GetUserInput();            
             if (terminate)
-                Exit();
+            {
+                TerminateThread(PacketCaptureProcessThread, 0);
+                Exit(0);
+            }
 
             display.UpdateDisplay();
             display.DrawScreen();
@@ -151,11 +175,6 @@ int main(int argc, char *argv[])
     {
         int error = GetLastError();
         std::cout << error;
+        return error;
     }
-
-    BOOL terminateSuccess;
-
-    terminateSuccess = TerminateProcess(piProcInfo.hProcess, 0);    
-
-    std::cout << "Program complete.\n";
 }

@@ -35,9 +35,9 @@ void DnsDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* sta
 	std::vector<DnsData> dnsDatas;
 	dnsDatas.reserve(200);
 
-	for (int i = 0; i < state->ipConnections.udpConnections.size(); i++)
+	for (int i = 0; i < state->ipConnections.allConnections.size(); i++)
 	{
-		Connection* connection = &(state->ipConnections.udpConnections[i]);
+		Connection* connection = &(state->ipConnections.allConnections[i]);
 		if (connection->protocol != Protocol::ProtoEnum::DNS)
 			continue;
 

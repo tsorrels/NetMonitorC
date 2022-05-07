@@ -3,16 +3,30 @@
 #include <string>
 #include <vector>
 #include <windows.h>
+#include <stdio.h>
+#include <iostream>
 
 #define PACKETMAXCAPACITY 30
 
-NetMonitorState::NetMonitorState()
-{
-	packetsRead = 0;
-}
-
 void NetMonitorState::Initialize()
 {
+	packetsRead = 0;
+
+	connectionsProcInfosMutex = CreateMutex(
+		NULL,              // default security attributes
+		FALSE,             // initially not owned
+		NULL);             // unnamed mutex
+
+	recentPacketsMutex = CreateMutex(
+		NULL,              // default security attributes
+		FALSE,             // initially not owned
+		NULL);             // unnamed mutex
+
+	netProcInfosMutex = CreateMutex(
+		NULL,              // default security attributes
+		FALSE,             // initially not owned
+		NULL);             // unnamed mutex
+
 	NetMonitorState::UpdateNetProcs();
 
 	NetMonitorState::lastConnectionsSort = std::chrono::system_clock::now();
@@ -39,21 +53,9 @@ void NetMonitorState::ProcessPacket(IpPacket *packet)
 		return;
 	}
 
-	// find if there is already a connection
 	Connection * connection = NULL;
 
-	//switch (packet->ipVersion)
-	//{
-	//case IPVersion::IPv4:
-		connection = FindConnection(&ipConnections, packet);
-	//	break;
-	//case IPVersion::IPv6:
-	//	connection = FindConnection(&ipv6Connections, packet);
-	//	break;
-	//default:
-	//	// don't do anything
-	//	return;		
-	//}
+	connection = FindConnection(&ipConnections, packet);
 
 	// if connection exists, update it
 	if (connection != NULL)
@@ -65,43 +67,50 @@ void NetMonitorState::ProcessPacket(IpPacket *packet)
 	{
 		// if not, create a new one
 		Connection newConnection = Connection(packet);
+		IpConnections* ipConnectionsPtr = &ipConnections;
 
-		IpConnections* ipConnectionsPtr = NULL;
+		std::vector<Connection>* connectionsPtr = &((*ipConnectionsPtr).allConnections);
 		
-			ipConnectionsPtr = &ipConnections;
-
-		std::vector<Connection>* connectionsPtr = NULL;
-		switch (packet->transportProtocol)
-		{
-		case TransportProtocol::TCP:
-			connectionsPtr = &((*ipConnectionsPtr).tcpConnections);
-			break;
-		case TransportProtocol::UDP:
-			connectionsPtr = &((*ipConnectionsPtr).udpConnections);
-			break;
-		case TransportProtocol::ICMP:
-			connectionsPtr = &((*ipConnectionsPtr).icmpConnections);
-			break;
-		default:
-			// don't do anything
-			return;
-		}
-
 		// add connection to state
 		(*connectionsPtr).push_back(newConnection);
 	}
 
-	NetMonitorState::localInterfaces.insert(packet->GetLocalNetworkAddress().IpAddress);
+	// NetMonitorState::localInterfaces.insert(packet->GetLocalNetworkAddress().IpAddress);
 
 	NetMonitorState::packetsRead++;
 
-	// TODO: use pointer to packet instead of copy
-	NetMonitorState::recentPackets.push_back(packet);
-	if (recentPackets.size() == PACKETMAXCAPACITY)
+	DWORD acquireMutexResult = WaitForSingleObject(recentPacketsMutex, INFINITE);
+
+	switch (acquireMutexResult)
 	{
-		delete recentPackets.front();
-		recentPackets.pop_front();
+	case WAIT_OBJECT_0:
+
+			NetMonitorState::recentPackets.push_back(packet);
+			if (recentPackets.size() == PACKETMAXCAPACITY)
+			{
+				IpPacket* packet = recentPackets.front();
+				recentPackets.pop_front();
+				delete packet;
+			}
+
+			if (!ReleaseMutex(recentPacketsMutex))
+			{
+				std::cout << "Error releasing mutex.";
+				// Handle error.
+			}
+
+		break;
+
+		// The thread got ownership of an abandoned mutex
+		// The database is in an indeterminate state
+	case WAIT_ABANDONED:
+		std::cout << "Mutex returned ABANDONED.";
+
+	default:
+		std::cout << "Mutex returned something else.";
 	}
+
+	// ReleaseMutex(recentPacketsMutex);
 }
 
 Connection* NetMonitorState::FindConnection(TransportProtocol transportProtocol, IPVersion ipVersion, NetworkAddress localNetworkAddress, NetworkAddress remoteNetworkAddress)
@@ -115,10 +124,10 @@ Connection* NetMonitorState::FindConnection(TransportProtocol transportProtocol,
 	switch (transportProtocol)
 	{
 	case (TransportProtocol::UDP):
-		connections = &(ipConnections->udpConnections);
+		connections = &(ipConnections->allConnections);
 		break;
 	case (TransportProtocol::TCP):
-		connections = &(ipConnections->tcpConnections);
+		connections = &(ipConnections->allConnections);
 		break;
 	default:
 		return NULL;
@@ -150,13 +159,13 @@ Connection * NetMonitorState::FindConnection(IpConnections * ipConnections, IpPa
 	switch (packet->transportProtocol)
 	{
 	case TransportProtocol::UDP:
-		connectionsPtr = &((*ipConnections).udpConnections);
+		connectionsPtr = &((*ipConnections).allConnections);
 		break;
 	case TransportProtocol::TCP:
-		connectionsPtr = &((*ipConnections).tcpConnections);
+		connectionsPtr = &((*ipConnections).allConnections);
 		break;
 	case TransportProtocol::ICMP:
-		connectionsPtr = &((*ipConnections).icmpConnections);
+		connectionsPtr = &((*ipConnections).allConnections);
 		break;
 	default:
 		return NULL;
@@ -207,16 +216,17 @@ bool CompareConnectionSize(Connection connection1, Connection connection2)
 
 void IpConnections::SortConnections(TransportProtocol transportProtocol)
 {
+	//TODO: SortConnections behavior should depend on TransportProtocol input
 	switch (transportProtocol)
 	{
 	case TransportProtocol::UDP:
-		std::sort(udpConnections.begin(), udpConnections.end(), CompareConnectionSize);
+		std::sort(allConnections.begin(), allConnections.end(), CompareConnectionSize);
 		break;
 	case TransportProtocol::TCP:
-		std::sort(tcpConnections.begin(), tcpConnections.end(), CompareConnectionSize);
+		std::sort(allConnections.begin(), allConnections.end(), CompareConnectionSize);
 		break;
 	case TransportProtocol::ICMP:
-		std::sort(icmpConnections.begin(), icmpConnections.end(), CompareConnectionSize);
+		std::sort(allConnections.begin(), allConnections.end(), CompareConnectionSize);
 		break;
 	default:
 		break;
@@ -226,9 +236,9 @@ void IpConnections::SortConnections(TransportProtocol transportProtocol)
 
 void IpConnections::SortAllConnections ()
 {
-	std::sort(udpConnections.begin(), udpConnections.end(), CompareConnectionSize);
-	std::sort(tcpConnections.begin(), tcpConnections.end(), CompareConnectionSize);
-	std::sort(icmpConnections.begin(), icmpConnections.end(), CompareConnectionSize);
+	std::sort(allConnections.begin(), allConnections.end(), CompareConnectionSize);
+	//std::sort(tcpConnections.begin(), tcpConnections.end(), CompareConnectionSize);
+	//std::sort(icmpConnections.begin(), icmpConnections.end(), CompareConnectionSize);
 }
 
 void NetMonitorState::UpdateNetProcsIfNeeded()
@@ -245,11 +255,15 @@ void NetMonitorState::UpdateNetProcsIfNeeded()
 
 void NetMonitorState::UpdateNetProcs()
 {
+	WaitForSingleObject(netProcInfosMutex, INFINITE);
+
 	NetMonitorState::netProcInfos.clear();
 	auto netstatEntries = NetMonitorState::GetNetstat();
 	auto processEntries = NetMonitorState::GetProcesses();
 
 	NetMonitorState::netProcInfos = NetMonitorState::GetNetProcInfos(&netstatEntries, &processEntries);
+
+	ReleaseMutex(netProcInfosMutex);
 }
 
 std::vector<ProcessEntry> NetMonitorState::GetProcesses()

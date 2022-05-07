@@ -63,6 +63,12 @@
     <ClCompile Include="DisplayTab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NetMonitorEnums.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NetMonitorProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PacketProcessor.h">
@@ -99,6 +105,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DnsPacket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NetMonitorEnums.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NetMonitorProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

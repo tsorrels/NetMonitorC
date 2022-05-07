@@ -6,7 +6,6 @@
 #include "NetMonitorDisplay.h";
 #include "../Dependencies/pdcurses/curses.h"
 
-
 ProcessDisplayTab::ProcessDisplayTab()
 {
 	ProcessDisplayTab::TabName = " PROC ";
@@ -21,7 +20,7 @@ void ProcessDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState*
 	int currentLine = display->currentLine;
 	int numScreenColumns = display->numDisplayColumns;
 
-	std::string rawHeaderline = "Name             PID    State         LocalAddr                           RemoteAddr                PROTO  Rx    Tx";
+	std::string rawHeaderline = "Name             PID    State         LocalAddr                         RemoteAddr                       PROTO  Rx    Tx";
 
 	wattron(window, A_UNDERLINE);
 	mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine(rawHeaderline, numScreenColumns).c_str());
@@ -29,9 +28,14 @@ void ProcessDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState*
 
 	currentLine++;
 
+	WaitForSingleObject(state->netProcInfosMutex, INFINITE);
+
 	for (int i = 0; i < state->netProcInfos.size() ; i++)
 	{
 		NetProcInfo* netProcInfo = &((state->netProcInfos)[i]);
+
+		if (netProcInfo->LocalAddress.empty())
+			continue;
 
 		std::string ipVersionString;
 
@@ -75,6 +79,8 @@ void ProcessDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState*
 		}
 	}
 
+	ReleaseMutex(state->netProcInfosMutex);
+
 	NetMonitorDisplay::ClearScreenBelowRow(currentLine, display->numDisplayLines, display->numDisplayColumns, display->window);
 }
 
@@ -95,8 +101,8 @@ std::string ProcessDisplayTab::ToDisplayText(NetProcInfo* netProcInfo)
 	displayText += NetMonitorDisplay::FormatLine(netProcInfo->Name, 17);
 	displayText += NetMonitorDisplay::FormatLine(netProcInfo->PID, 7);
 	displayText += NetMonitorDisplay::FormatLine(netProcInfo->State, 14);
-	displayText += NetMonitorDisplay::FormatLine(netProcInfo->LocalAddress, 32);
-	displayText += NetMonitorDisplay::FormatLine(netProcInfo->DstAddress, 32);
+	displayText += NetMonitorDisplay::FormatLine(netProcInfo->LocalAddress, 34);
+	displayText += NetMonitorDisplay::FormatLine(netProcInfo->DstAddress, 34);
 	displayText += NetMonitorDisplay::FormatLine(netProcInfo->PROTO, 5);
 
 	return displayText;

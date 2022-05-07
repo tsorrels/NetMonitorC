@@ -29,11 +29,8 @@ namespace NetMonitorTests
 
 			state.ProcessPacket(&tcpPacket);
 
-			Assert::AreEqual(1, (int)state.ipConnections.tcpConnections.size());
-			Assert::AreEqual(0, (int)state.ipConnections.udpConnections.size());
-			Assert::AreEqual(0, (int)state.ipConnections.icmpConnections.size());
-
-			Assert::AreEqual(1001, (int)state.ipConnections.tcpConnections[0].localNetworkAddress.port);
+			Assert::AreEqual(0, (int)state.ipConnections.allConnections.size());
+			Assert::AreEqual(1001, (int)state.ipConnections.allConnections[0].localNetworkAddress.port);
 		}
 
 		TEST_METHOD(NetMonitorState_ProcessTcpPacket_ConnectionUpdated)
@@ -73,7 +70,7 @@ namespace NetMonitorTests
 
 			Assert::AreEqual(1, (int)state.ipConnections.tcpConnections.size());
 			Assert::AreEqual(2000, state.ipConnections.tcpConnections[0].rxBytes);
-			Assert::AreEqual(0, (int)state.ipConnections.udpConnections.size());
+			Assert::AreEqual(0, (int)state.ipConnections.allConnections.size());
 			Assert::AreEqual(0, (int)state.ipConnections.icmpConnections.size());
 		}
 
@@ -115,7 +112,7 @@ namespace NetMonitorTests
 			Assert::AreEqual(1, (int)state.ipConnections.tcpConnections.size());
 			Assert::AreEqual(1000, state.ipConnections.tcpConnections[0].rxBytes);
 			Assert::AreEqual(1000, state.ipConnections.tcpConnections[0].txBytes);
-			Assert::AreEqual(0, (int)state.ipConnections.udpConnections.size());
+			Assert::AreEqual(0, (int)state.ipConnections.allConnections.size());
 			Assert::AreEqual(0, (int)state.ipConnections.icmpConnections.size());
 		}
 
@@ -157,7 +154,7 @@ namespace NetMonitorTests
 			Assert::AreEqual(1, (int)state.ipConnections.tcpConnections.size());
 			Assert::AreEqual(1000, state.ipConnections.tcpConnections[0].rxBytes);
 
-			Assert::AreEqual(0, (int)state.ipConnections.udpConnections.size());
+			Assert::AreEqual(0, (int)state.ipConnections.allConnections.size());
 			Assert::AreEqual(0, (int)state.ipConnections.icmpConnections.size());
 		}
 
@@ -193,15 +190,15 @@ namespace NetMonitorTests
 			connection4.rxBytes = 1000;
 			connection4.txBytes = 2001;
 
-			state.ipConnections.udpConnections.push_back(connection1);
-			state.ipConnections.udpConnections.push_back(connection2);
-			state.ipConnections.udpConnections.push_back(connection3);
-			state.ipConnections.udpConnections.push_back(connection4);
+			state.ipConnections.allConnections.push_back(connection1);
+			state.ipConnections.allConnections.push_back(connection2);
+			state.ipConnections.allConnections.push_back(connection3);
+			state.ipConnections.allConnections.push_back(connection4);
 
 			state.ipConnections.SortAllConnections();
 
-			Connection largestConnection = state.ipConnections.udpConnections[0];
-			Connection smallestConnection = state.ipConnections.udpConnections[3];
+			Connection largestConnection = state.ipConnections.allConnections[0];
+			Connection smallestConnection = state.ipConnections.allConnections[3];
 
 			Assert::AreEqual("1.1.1.1", largestConnection.localNetworkAddress.IpAddress.c_str());
 			Assert::AreEqual(3000, largestConnection.rxBytes + largestConnection.txBytes);
@@ -259,7 +256,7 @@ namespace NetMonitorTests
 			state.ProcessPacket(&dnsPacket1);
 			state.ProcessPacket(&dnsPacket2);
 
-			Connection dnsConnection = state.ipConnections.udpConnections[0];
+			Connection dnsConnection = state.ipConnections.allConnections[0];
 			
 			std::string expectedDataString = "100,A,www.yahoo.com;200,A,www.bing.com;";
 

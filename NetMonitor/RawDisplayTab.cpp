@@ -30,9 +30,14 @@ void RawDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* sta
 
 	currentLine++;
 
-	for (int i = 0; i < state->recentPackets.size() && i < PACKETSTODISPLAY; i++)
+	//	WaitForSingleObject(state->netProcInfosMutex, INFINITE);
+	WaitForSingleObject(state->recentPacketsMutex, INFINITE);
+
+	int numPackets = state->recentPackets.size();
+
+	for (int i = 0; i < numPackets && i < PACKETSTODISPLAY; i++)
 	{
-		IpPacket* packet = (state->recentPackets[i]);
+		IpPacket* packet = ((state->recentPackets)[i]);
 
 		std::string packetString = RawDisplayTab::ToDisplayText(packet);
 
@@ -42,6 +47,8 @@ void RawDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* sta
 			currentLine++;
 		}
 	}
+
+	ReleaseMutex(state->recentPacketsMutex);
 
 	NetMonitorDisplay::ClearScreenBelowRow(currentLine, display->numDisplayLines, display->numDisplayColumns, display->window);
 }
