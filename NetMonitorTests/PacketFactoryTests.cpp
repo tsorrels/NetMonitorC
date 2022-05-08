@@ -2,10 +2,10 @@
 #include "CppUnitTest.h"
 #include <string>
 #include <vector>
-#include <../NetMonitor/DnsPacket.h>
-#include <../NetMonitor/TcpPacket.h>
-#include <../NetMonitor/UdpPacket.h>
-#include <../NetMonitor/IcmpPacket.h>
+#include "../NetMonitor/DnsPacket.h"
+#include "../NetMonitor/TcpPacket.h"
+#include "../NetMonitor/UdpPacket.h"
+#include "../NetMonitor/IcmpPacket.h"
 #include "../NetMonitor/PacketFactory.h"
 #include "../NetMonitor/PacketStringTokenizer.h"
 
@@ -29,7 +29,8 @@ namespace NetMonitorTests
 			PacketStringTokenizer packetStringTokenizer = PacketStringTokenizer::PacketStringTokenizer(packetString);
 			std::vector<std::string> packetTokens = packetStringTokenizer.GetAllTokens(" ,");
 
-			IpPacket * packet = PacketFactory::CreatePacket(infoTokens, packetTokens);			
+			IpPacket * packet = PacketFactory::CreatePacket(infoTokens, packetTokens);		
+			TcpPacket* tcpPacket = (TcpPacket*)packet;
 
 			NetworkAddress localNetworkAddress = packet->GetLocalNetworkAddress();
 			NetworkAddress remoteNetworkAddress = packet->GetRemoteNetworkAddress();
@@ -39,6 +40,7 @@ namespace NetMonitorTests
 			Assert::AreEqual(std::string("10.0.0.146"), remoteNetworkAddress.IpAddress);
 			Assert::AreEqual(56890, remoteNetworkAddress.port);
 			Assert::AreEqual((int)TransportProtocol::TCP, (int)packet->transportProtocol);
+			Assert::AreEqual(false, (tcpPacket->synSet));
 
 			delete packet;
 		}

@@ -35,7 +35,7 @@ void HomeDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* st
 	// (*state).ipConnections.SortAllConnections();
 
 	WaitForSingleObject(state->connectionsProcInfosMutex, INFINITE);
-	UpdateDisplayConnections((*state).ipConnections.allConnections, MaxConnectionsToDisplay, numScreenColumns, &currentLine, display->window);
+	UpdateDisplayConnections(&((*state).ipConnections.allConnections), MaxConnectionsToDisplay, numScreenColumns, &currentLine, display->window, state->filterString);
 
 	NetMonitorDisplay::ClearScreenBelowRow(currentLine, display->numDisplayLines, display->numDisplayColumns, display->window);
 
@@ -104,30 +104,31 @@ void HomeDisplayTab::ToggleBold(Connection connection, WINDOW* window)
 	}
 }
 
-void HomeDisplayTab::UpdateDisplayConnections(std::vector<Connection> connections, int linesToWrite, int numColumns, int* currentLine, WINDOW* window)
+void HomeDisplayTab::UpdateDisplayConnections(std::vector<Connection*> *connections, int linesToWrite, int numColumns, int* currentLine, WINDOW* window, std::string filterString)
 {
-	for (int i = 0; i < linesToWrite && i < connections.size(); i++)
+	for (int i = 0; i < linesToWrite && i < connections->size(); i++)
 	{
-		// turn on bold
-
-		Connection* connection = &(connections[i]);
+		Connection* connection = (*connections)[i];
 
 		std::string displayLine = HomeDisplayTab::ToDisplayText(*connection);
 
-		HomeDisplayTab::ToggleBold(*connection, window);
-		mvwaddstr(window, *currentLine, 0, NetMonitorDisplay::FormatLine(displayLine, numColumns).c_str());
-
-		// add STANDOUT blocks to line
-		if (connection->IsActive()) 
+		if (DisplayTab::DisplayLinePassesFilter(displayLine, filterString))
 		{
-			wattron(window, A_STANDOUT);
-			int startingCol = displayLine.length() + 1;
-			std::string rateBar = GetRateBar(*connection);
-			mvwaddstr(window, *currentLine, startingCol, rateBar.c_str());
-		}
+			HomeDisplayTab::ToggleBold(*connection, window);
+			mvwaddstr(window, *currentLine, 0, NetMonitorDisplay::FormatLine(displayLine, numColumns).c_str());
 
-		(*currentLine)++;
-		wattrset(window, 0);
+			// add STANDOUT blocks to line
+			if (connection->IsActive())
+			{
+				wattron(window, A_STANDOUT);
+				int startingCol = displayLine.length() + 1;
+				std::string rateBar = GetRateBar(*connection);
+				mvwaddstr(window, *currentLine, startingCol, rateBar.c_str());
+			}
+
+			(*currentLine)++;
+			wattrset(window, 0);
+		}
 	}
 }
 

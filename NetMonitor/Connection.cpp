@@ -39,6 +39,8 @@ void Connection::UpdateConnection(IpPacket* packet)
 {
 	UpdateBytes(*packet);
 
+	numPackets++;
+
 	// TODO: do something with data
 	data += packet->GetData();
 }

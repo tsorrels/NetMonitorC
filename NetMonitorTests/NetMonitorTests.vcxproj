@@ -117,6 +117,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\ConnectionFactory.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\PacketStringTokenizer.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\Connection.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\PacketProcessor.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\PacketFactory.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\NetMonitorState.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\NetworkAddress.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\Protocol.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\DnsData.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\IcmpPacket.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\NetMonitorEnums.obj";%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

@@ -1,5 +1,4 @@
 
-
 #include <string>
 #include <vector>
 #include <chrono>
@@ -7,8 +6,6 @@
 #include "DnsPacket.h";
 #include "NetMonitorDisplay.h";
 #include "../Dependencies/pdcurses/curses.h"
-
-
 
 DnsDisplayTab::DnsDisplayTab()
 {
@@ -37,23 +34,13 @@ void DnsDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* sta
 
 	for (int i = 0; i < state->ipConnections.allConnections.size(); i++)
 	{
-		Connection* connection = &(state->ipConnections.allConnections[i]);
+		Connection* connection = (state->ipConnections.allConnections[i]);
 		if (connection->protocol != Protocol::ProtoEnum::DNS)
 			continue;
 
 		std::vector<DnsData> dnsDataObjects = DnsData::FromMultipleDataString(connection->data);
 		dnsDatas.insert(dnsDatas.end(), dnsDataObjects.begin(), dnsDataObjects.end());
 	}
-
-	//for (int i = 0; i < state->ipv6Connections.udpConnections.size(); i++)
-	//{
-	//	Connection* connection = &(state->ipv6Connections.udpConnections[i]);
-	//	if (connection->protocol != Protocol::ProtoEnum::DNS)
-	//		continue;
-
-	//	std::vector<DnsData> dnsDataObjects = DnsData::FromMultipleDataString(connection->data);
-	//	dnsDatas.insert(dnsDatas.end(), dnsDataObjects.begin(), dnsDataObjects.end());
-	//}
 
 	std::sort(dnsDatas.begin(), dnsDatas.end(), DnsData::CompareDnsData);
 

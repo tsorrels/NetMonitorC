@@ -2,10 +2,11 @@
 #include "NetMonitorState.h"
 #include "PacketProcessor.h"
 
-NetMonitorProcessor::NetMonitorProcessor(PacketProcessor* packetProcessor, NetMonitorState* state)
+NetMonitorProcessor::NetMonitorProcessor(PacketProcessor* packetProcessor, NetMonitorState* state, bool* continueFlag)
 {
 	NetMonitorProcessor::packetProcessor = packetProcessor;
 	NetMonitorProcessor::state = state;
+	NetMonitorProcessor::continueFlag = continueFlag;
 }
 
 void NetMonitorProcessor::Run()
@@ -16,5 +17,8 @@ void NetMonitorProcessor::Run()
 
 		state->ProcessPacket(packet);
 		state->UpdateNetProcsIfNeeded();
+
+		if (!(*continueFlag))
+			break;
 	}
 }

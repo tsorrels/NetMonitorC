@@ -14,12 +14,14 @@ void NetMonitorDisplay::InitializeAllDisplayTabs()
 	DnsDisplayTab* dnsDisplayTab = new DnsDisplayTab();
 	RawDisplayTab* rawDisplayTab = new RawDisplayTab();
 	ProcessDisplayTab* processDisplayTab = new ProcessDisplayTab();
+	TcpDisplayTab* tcpDisplayTab = new TcpDisplayTab();
 
 	// by convention the HOME tab is always first
 	NetMonitorDisplay::displayTabs.push_back(homeDisplayTab);
 	NetMonitorDisplay::displayTabs.push_back(dnsDisplayTab);
 	NetMonitorDisplay::displayTabs.push_back(rawDisplayTab);
 	NetMonitorDisplay::displayTabs.push_back(processDisplayTab);
+	NetMonitorDisplay::displayTabs.push_back(tcpDisplayTab);
 }
 
 bool NetMonitorDisplay::GetUserInput()

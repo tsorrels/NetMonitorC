@@ -31,6 +31,7 @@ public:
 	Protocol::ProtoEnum protocol;
 	std::string data;
 	IPVersion ipVersion;
+	int numPackets;
 
 	// for unit testing
 	Connection()
@@ -38,21 +39,35 @@ public:
 	}
 
 	Connection(IpPacket* packet);
-	void UpdateConnection(IpPacket* packet);
+	virtual void UpdateConnection(IpPacket* packet);
 	std::string Serialize();
 	double Getkbs(std::chrono::time_point<std::chrono::system_clock> lastRx, int packetLength);
 	bool IsActive();
-
-private:		
 	void UpdateBytes(IpPacket packet);
+};
+
+class ConnectionFactory
+{
+public:
+	Connection* CreateConnection(IpPacket* packet);
+};
+
+class TcpConnection : public Connection
+{
+public:
+	int numRst;
+	int numFin;
+	int numAck;
+	int numSyn;
+	int numPsh;
+
+	void UpdateConnection(IpPacket* packet);
 };
 
 class IpConnections
 {
 public:
-	std::vector<Connection> allConnections;
-	//std::vector<Connection> tcpConnections;
-	//std::vector<Connection> icmpConnections;
+	std::vector<Connection*> allConnections;
 
 	void SortConnections(TransportProtocol transportProtocol);
 	void SortAllConnections();
@@ -112,6 +127,7 @@ State
 
 	HANDLE connectionsProcInfosMutex;
 	IpConnections ipConnections;
+	ConnectionFactory connectionFactory;
 	std::map<std::string, int> packetVersionHistory;
 
 	int packetsRead;
@@ -139,7 +155,7 @@ State
 	
 
 private:
-	Connection* FindConnection(IpConnections * ipConnections, IpPacket *packet);
+	Connection* FindConnection(IpPacket *packet);
 	std::string GetProcessOutput(std::string commandString);
 };
 

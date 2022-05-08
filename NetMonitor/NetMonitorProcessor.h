@@ -5,8 +5,9 @@
 class NetMonitorProcessor
 {
 public:
-	NetMonitorProcessor(PacketProcessor* packetProcessor, NetMonitorState* state);
+	NetMonitorProcessor(PacketProcessor* packetProcessor, NetMonitorState* state, bool* continueFlag);
 	void Run();
+	bool * continueFlag;
 
 private:
 	PacketProcessor* packetProcessor;

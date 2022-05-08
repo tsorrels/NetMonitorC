@@ -44,7 +44,7 @@ public:
 	void UpdateTabDisplay(DisplayState* display, NetMonitorState* state) override;
 
 private:
-	void UpdateDisplayConnections(std::vector<Connection> connections, int linesToWrite, int numColumns, int* currentLine, WINDOW* window);
+	void UpdateDisplayConnections(std::vector<Connection*> *connections, int linesToWrite, int numColumns, int* currentLine, WINDOW* window, std::string filterString);
 	std::string ToDisplayText(Connection connection);
 
 	std::string GetTransmitString(Connection connection);
@@ -60,6 +60,16 @@ public:
 
 private:
 	std::string ToDisplayText(DnsData dnsData);
+};
+
+class TcpDisplayTab : public DisplayTab
+{
+public:
+	TcpDisplayTab();
+	void UpdateTabDisplay(DisplayState* display, NetMonitorState* state) override;
+
+private:
+	std::string ToDisplayText(Connection* connection);
 };
 
 class RawDisplayTab : public DisplayTab

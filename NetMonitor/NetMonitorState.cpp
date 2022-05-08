@@ -32,6 +32,7 @@ void NetMonitorState::Initialize()
 	NetMonitorState::lastConnectionsSort = std::chrono::system_clock::now();
 	NetMonitorState::lastUIUpdate = std::chrono::system_clock::now();
 	NetMonitorState::lastNetProcUpdate = std::chrono::system_clock::now();
+	NetMonitorState::connectionFactory = ConnectionFactory();
 }
 
 void NetMonitorState::ProcessPacket(IpPacket *packet)
@@ -55,7 +56,7 @@ void NetMonitorState::ProcessPacket(IpPacket *packet)
 
 	Connection * connection = NULL;
 
-	connection = FindConnection(&ipConnections, packet);
+	connection = FindConnection(packet);
 
 	// if connection exists, update it
 	if (connection != NULL)
@@ -66,13 +67,10 @@ void NetMonitorState::ProcessPacket(IpPacket *packet)
 	else
 	{
 		// if not, create a new one
-		Connection newConnection = Connection(packet);
-		IpConnections* ipConnectionsPtr = &ipConnections;
-
-		std::vector<Connection>* connectionsPtr = &((*ipConnectionsPtr).allConnections);
-		
+		Connection *newConnection = connectionFactory.CreateConnection(packet);
+	
 		// add connection to state
-		(*connectionsPtr).push_back(newConnection);
+		ipConnections.allConnections.push_back(newConnection);
 	}
 
 	// NetMonitorState::localInterfaces.insert(packet->GetLocalNetworkAddress().IpAddress);
@@ -115,27 +113,11 @@ void NetMonitorState::ProcessPacket(IpPacket *packet)
 
 Connection* NetMonitorState::FindConnection(TransportProtocol transportProtocol, IPVersion ipVersion, NetworkAddress localNetworkAddress, NetworkAddress remoteNetworkAddress)
 {
-	IpConnections* ipConnections = NULL;
-	
-		ipConnections = &(NetMonitorState::ipConnections);
+	 std::vector<Connection*> connections = ipConnections.allConnections;
 
-
-	 std::vector<Connection>* connections = NULL;
-	switch (transportProtocol)
+	for (int i = 0; i < ipConnections.allConnections.size(); i++)
 	{
-	case (TransportProtocol::UDP):
-		connections = &(ipConnections->allConnections);
-		break;
-	case (TransportProtocol::TCP):
-		connections = &(ipConnections->allConnections);
-		break;
-	default:
-		return NULL;
-	}
-
-	for (int i = 0; i < connections->size(); i++)
-	{
-		Connection* currentConnection = &((*connections)[i]);
+		Connection* currentConnection = (ipConnections.allConnections[i]);
 
 		if ((currentConnection->localNetworkAddress.IpAddress == localNetworkAddress.IpAddress)
 			&& (currentConnection->localNetworkAddress.port == localNetworkAddress.port)
@@ -150,30 +132,15 @@ Connection* NetMonitorState::FindConnection(TransportProtocol transportProtocol,
 	return NULL;
 }
 
-Connection * NetMonitorState::FindConnection(IpConnections * ipConnections, IpPacket *packet)
+Connection * NetMonitorState::FindConnection(/*IpConnections * ipConnections,*/ IpPacket *packet)
 {
 	Connection * returnedConnection = NULL;
 
-	std::vector<Connection>* connectionsPtr = NULL;
 
-	switch (packet->transportProtocol)
-	{
-	case TransportProtocol::UDP:
-		connectionsPtr = &((*ipConnections).allConnections);
-		break;
-	case TransportProtocol::TCP:
-		connectionsPtr = &((*ipConnections).allConnections);
-		break;
-	case TransportProtocol::ICMP:
-		connectionsPtr = &((*ipConnections).allConnections);
-		break;
-	default:
-		return NULL;
-	}
 
-	for (int i = 0; i < (*connectionsPtr).size(); i++)
+	for (int i = 0; i < ipConnections.allConnections.size(); i++)
 	{
-		Connection * connection = &((*connectionsPtr)[i]);
+		Connection * connection = (ipConnections.allConnections[i]);
 
 		if (packet->MatchNetworkAddresses((*connection).localNetworkAddress, (*connection).remoteNetworkAddress))
 		{
@@ -185,22 +152,22 @@ Connection * NetMonitorState::FindConnection(IpConnections * ipConnections, IpPa
 	return returnedConnection;
 }
 
-bool CompareConnectionSize(Connection connection1, Connection connection2)
+bool CompareConnectionSize(Connection *connection1, Connection *connection2)
 {
 	auto compareGracePeriod = std::chrono::seconds(2);
 
 	bool connection1IsBigger = false;
 
-	int connection1TotalBytes = connection1.txBytes + connection1.txBytes;
-	int connection2TotalBytes = connection2.txBytes + connection1.txBytes;
+	int connection1TotalBytes = connection1->txBytes + connection1->txBytes;
+	int connection2TotalBytes = connection2->txBytes + connection1->txBytes;
 
-	auto connection1LastTrans = connection1.lastRx;
-	if (connection1LastTrans < connection1.lastTx)
-		connection1LastTrans = connection1.lastTx;
+	auto connection1LastTrans = connection1->lastRx;
+	if (connection1LastTrans < connection1->lastTx)
+		connection1LastTrans = connection1->lastTx;
 
-	auto connection2LastTrans = connection2.lastRx;
-	if (connection2LastTrans < connection2.lastTx)
-		connection2LastTrans = connection2.lastTx;
+	auto connection2LastTrans = connection2->lastRx;
+	if (connection2LastTrans < connection2->lastTx)
+		connection2LastTrans = connection2->lastTx;
 
 	if (connection1LastTrans - compareGracePeriod > connection2LastTrans)
 	{
@@ -216,22 +183,9 @@ bool CompareConnectionSize(Connection connection1, Connection connection2)
 
 void IpConnections::SortConnections(TransportProtocol transportProtocol)
 {
-	//TODO: SortConnections behavior should depend on TransportProtocol input
-	switch (transportProtocol)
-	{
-	case TransportProtocol::UDP:
+
 		std::sort(allConnections.begin(), allConnections.end(), CompareConnectionSize);
-		break;
-	case TransportProtocol::TCP:
-		std::sort(allConnections.begin(), allConnections.end(), CompareConnectionSize);
-		break;
-	case TransportProtocol::ICMP:
-		std::sort(allConnections.begin(), allConnections.end(), CompareConnectionSize);
-		break;
-	default:
-		break;
-		// do not do anything;
-	}
+
 }
 
 void IpConnections::SortAllConnections ()

@@ -42,8 +42,8 @@ DWORD WINAPI ProcessCapture(LPVOID lpParam)
 {
     NetMonitorProcessor* netMonitorProcessor = (NetMonitorProcessor*)lpParam;
 
-    // run forever, must be terminated by main thread
-    netMonitorProcessor->Run();
+    // Run until bool continueFlag = false, set by main thread
+    netMonitorProcessor->Run(); 
     return 0;
 }
 
@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    // TODO: use GetSystemDirectory() and replace absolute path
     TCHAR cmdLine[] = TEXT("C:\\Windows\\System32\\PktMon.exe start --capture -m real-time");
     TCHAR processDirectory[] = TEXT("c:\\Windows\\System32");
     PROCESS_INFORMATION piProcInfo;
@@ -132,8 +133,10 @@ int main(int argc, char *argv[])
         NetMonitorState state = NetMonitorState();
         state.Initialize();
 
+        // TODO: replace with thread safe mechanism like wait on a handle
+        bool continueFlag = true;
         NetMonitorDisplay display = NetMonitorDisplay::NetMonitorDisplay(window, &state);    
-        NetMonitorProcessor netMonitorProcessor = NetMonitorProcessor(&packetProcessor, &state);
+        NetMonitorProcessor netMonitorProcessor = NetMonitorProcessor(&packetProcessor, &state, &continueFlag);
 
         DWORD threadId;
         HANDLE PacketCaptureProcessThread = CreateThread(
@@ -154,16 +157,17 @@ int main(int argc, char *argv[])
 
         while (true)
         {
-            //IpPacket * packet = packetProcessor.GetNextPacket();
-
-            //state.ProcessPacket(packet);
-            //state.UpdateNetProcsIfNeeded();
-
             // TODO: only update dislay every 100 ms
             bool terminate = display.GetUserInput();            
             if (terminate)
             {
-                TerminateThread(PacketCaptureProcessThread, 0);
+                // signal packet reader thread to end
+                continueFlag = false;
+
+                // wait for thread to terminate
+                CloseHandle(PacketCaptureProcessThread);
+                WaitForSingleObject(PacketCaptureProcessThread, 5000);
+
                 Exit(0);
             }
 

@@ -30,6 +30,21 @@ public:
 			localPort = std::stoi(GetPortFromNetworkAddress(ipTokens[10], ipVersion));
 			remotePort = std::stoi(GetPortFromNetworkAddress(ipTokens[8], ipVersion));
 		}
+
+		synSet = false; ackSet = false; finSet = false; rstSet = false; pshSet = false;
+
+		std::string flags = protoTokens[1];
+
+		if (flags.find("S") != std::string::npos)
+			synSet = true;
+		if (flags.find(".") != std::string::npos)
+			ackSet = true;
+		if (flags.find("F") != std::string::npos)
+			finSet = true;
+		if (flags.find("R") != std::string::npos)
+			rstSet = true;
+		if (flags.find("P") != std::string::npos)
+			pshSet = true;
 	};
 
 	virtual NetworkAddress GetLocalNetworkAddress()
@@ -78,4 +93,14 @@ public:
 	int localPort;
 
 	int remotePort;
+
+	bool synSet;
+
+	bool ackSet;
+
+	bool finSet;
+
+	bool pshSet;
+
+	bool rstSet;
 };
