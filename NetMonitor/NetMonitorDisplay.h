@@ -29,6 +29,10 @@ public:
 class DisplayTab
 {
 public:
+	DisplayTab(int tabIndex) 
+	{
+		TabIndex = tabIndex;
+	};
 
 	// 0 = first tab, 1 = second tab, etc.
 	int TabIndex;
@@ -40,7 +44,11 @@ public:
 class HomeDisplayTab : public DisplayTab
 {
 public:
-	HomeDisplayTab();
+	HomeDisplayTab(int tabIndex) : DisplayTab(tabIndex)
+	{
+		TabName = "HOME";
+	};
+
 	void UpdateTabDisplay(DisplayState* display, NetMonitorState* state) override;
 
 private:
@@ -55,7 +63,11 @@ private:
 class DnsDisplayTab : public DisplayTab
 {
 public:
-	DnsDisplayTab();
+	DnsDisplayTab(int tabIndex) : DisplayTab(tabIndex)
+	{
+		TabName = " DNS ";
+	};
+
 	void UpdateTabDisplay(DisplayState* display, NetMonitorState* state) override;
 
 private:
@@ -65,7 +77,11 @@ private:
 class TcpDisplayTab : public DisplayTab
 {
 public:
-	TcpDisplayTab();
+	TcpDisplayTab(int tabIndex) : DisplayTab(tabIndex)
+	{
+		TabName = " TCP ";
+	};
+
 	void UpdateTabDisplay(DisplayState* display, NetMonitorState* state) override;
 
 private:
@@ -75,7 +91,11 @@ private:
 class RawDisplayTab : public DisplayTab
 {
 public:
-	RawDisplayTab();
+	RawDisplayTab(int tabIndex) : DisplayTab(tabIndex)
+	{
+		TabName = " RAW ";
+	};
+
 	void UpdateTabDisplay(DisplayState* display, NetMonitorState* state) override;
 
 private:
@@ -86,7 +106,11 @@ private:
 class ProcessDisplayTab : public DisplayTab
 {
 public:
-	ProcessDisplayTab();
+	ProcessDisplayTab(int tabIndex) : DisplayTab(tabIndex)
+	{
+		TabName = " PROC ";
+	};
+
 	void UpdateTabDisplay(DisplayState* display, NetMonitorState* state) override;
 
 private:

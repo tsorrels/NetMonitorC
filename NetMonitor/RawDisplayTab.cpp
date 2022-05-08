@@ -8,14 +8,6 @@
 
 #define PACKETSTODISPLAY 25
 
-RawDisplayTab::RawDisplayTab()
-{
-	RawDisplayTab::TabName = " RAW ";
-
-	// third tab;
-	TabIndex = 2;
-}
-
 void RawDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* state)
 {
 	WINDOW* window = display->window;

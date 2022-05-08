@@ -6,14 +6,6 @@
 #include "NetMonitorDisplay.h";
 #include "../Dependencies/pdcurses/curses.h"
 
-TcpDisplayTab::TcpDisplayTab()
-{
-	TcpDisplayTab::TabName = " TCP ";
-
-	// fourth tab;
-	TabIndex = 4;
-}
-
 void TcpDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* state)
 {
 	WINDOW* window = display->window;

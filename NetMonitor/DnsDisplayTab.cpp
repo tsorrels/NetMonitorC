@@ -7,14 +7,6 @@
 #include "NetMonitorDisplay.h";
 #include "../Dependencies/pdcurses/curses.h"
 
-DnsDisplayTab::DnsDisplayTab()
-{
-	DnsDisplayTab::TabName = " DNS ";
-
-	// second tab;
-	TabIndex = 1;
-}
-
 
 void DnsDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* state)
 {

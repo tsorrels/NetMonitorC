@@ -10,18 +10,19 @@ using namespace std::literals;
 
 void NetMonitorDisplay::InitializeAllDisplayTabs()
 {
-	HomeDisplayTab* homeDisplayTab = new HomeDisplayTab();
-	DnsDisplayTab* dnsDisplayTab = new DnsDisplayTab();
-	RawDisplayTab* rawDisplayTab = new RawDisplayTab();
-	ProcessDisplayTab* processDisplayTab = new ProcessDisplayTab();
-	TcpDisplayTab* tcpDisplayTab = new TcpDisplayTab();
+	HomeDisplayTab* homeDisplayTab = new HomeDisplayTab(0);
+	TcpDisplayTab* tcpDisplayTab = new TcpDisplayTab(1);
+	DnsDisplayTab* dnsDisplayTab = new DnsDisplayTab(2);
+	RawDisplayTab* rawDisplayTab = new RawDisplayTab(3);
+	ProcessDisplayTab* processDisplayTab = new ProcessDisplayTab(4);
 
-	// by convention the HOME tab is always first
+	// add these in the same order as above
 	NetMonitorDisplay::displayTabs.push_back(homeDisplayTab);
+	NetMonitorDisplay::displayTabs.push_back(tcpDisplayTab);
 	NetMonitorDisplay::displayTabs.push_back(dnsDisplayTab);
 	NetMonitorDisplay::displayTabs.push_back(rawDisplayTab);
 	NetMonitorDisplay::displayTabs.push_back(processDisplayTab);
-	NetMonitorDisplay::displayTabs.push_back(tcpDisplayTab);
+
 }
 
 bool NetMonitorDisplay::GetUserInput()

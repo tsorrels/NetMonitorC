@@ -9,14 +9,6 @@
 
 const int MaxConnectionsToDisplay = 100;
 
-HomeDisplayTab::HomeDisplayTab()
-{
-	HomeDisplayTab::TabName = "HOME";
-
-	// first tab;
-	TabIndex = 0;
-}
-
 void HomeDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* state)
 {
 	// main display

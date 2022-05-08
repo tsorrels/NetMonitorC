@@ -6,13 +6,6 @@
 #include "NetMonitorDisplay.h";
 #include "../Dependencies/pdcurses/curses.h"
 
-ProcessDisplayTab::ProcessDisplayTab()
-{
-	ProcessDisplayTab::TabName = " PROC ";
-
-	// fourth tab;
-	TabIndex = 3;
-}
 
 void ProcessDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* state)
 {
