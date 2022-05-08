@@ -153,8 +153,6 @@ int main(int argc, char *argv[])
             Exit(3);
         }
 
-        std::cout << "ChildThreadId = " << threadId;
-
         while (true)
         {
             // TODO: only update dislay every 100 ms
