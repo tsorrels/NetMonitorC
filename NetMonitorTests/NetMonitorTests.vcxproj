@@ -117,7 +117,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\ConnectionFactory.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\PacketStringTokenizer.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\Connection.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\PacketProcessor.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\PacketFactory.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\NetMonitorState.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\NetworkAddress.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\Protocol.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\DnsData.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\IcmpPacket.obj";"C:\src\repos\NetMonitorC\NetMonitor\x64\debug\NetMonitorEnums.obj";%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>"$(ProjectDir)..\NetMonitor\x64\Debug\ConnectionFactory.obj";"$(ProjectDir)..\NetMonitor\x64\Debug\TcpConnection.obj";"$(ProjectDir)..\NetMonitor\x64\Debug\PacketStringTokenizer.obj";"$(ProjectDir)..\NetMonitor\x64\Debug\Connection.obj";"$(ProjectDir)..\NetMonitor\x64\Debug\PacketProcessor.obj";"$(ProjectDir)..\NetMonitor\x64\Debug\PacketFactory.obj";"$(ProjectDir)..\NetMonitor\x64\Debug\NetMonitorState.obj";"$(ProjectDir)..\NetMonitor\x64\Debug\NetworkAddress.obj";"$(ProjectDir)..\NetMonitor\x64\Debug\Protocol.obj";"$(ProjectDir)..\NetMonitor\x64\Debug\DnsData.obj";"$(ProjectDir)..\NetMonitor\x64\Debug\IcmpPacket.obj";"$(ProjectDir)..\NetMonitor\x64\Debug\NetMonitorEnums.obj";%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -156,6 +156,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>"$(ProjectDir)..\NetMonitor\x64\Release\ConnectionFactory.obj";"$(ProjectDir)..\NetMonitor\x64\Release\TcpConnection.obj";"$(ProjectDir)..\NetMonitor\x64\Release\PacketStringTokenizer.obj";"$(ProjectDir)..\NetMonitor\x64\Release\Connection.obj";"$(ProjectDir)..\NetMonitor\x64\Release\PacketProcessor.obj";"$(ProjectDir)..\NetMonitor\x64\Release\PacketFactory.obj";"$(ProjectDir)..\NetMonitor\x64\Release\NetMonitorState.obj";"$(ProjectDir)..\NetMonitor\x64\Release\NetworkAddress.obj";"$(ProjectDir)..\NetMonitor\x64\Release\Protocol.obj";"$(ProjectDir)..\NetMonitor\x64\Release\DnsData.obj";"$(ProjectDir)..\NetMonitor\x64\Release\IcmpPacket.obj";"$(ProjectDir)..\NetMonitor\x64\Release\NetMonitorEnums.obj";%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
