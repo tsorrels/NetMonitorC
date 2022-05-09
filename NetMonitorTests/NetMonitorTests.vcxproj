@@ -160,6 +160,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ConnectionFactoryTests.cpp" />
     <ClCompile Include="NetMonitorStateTests.cpp" />
     <ClCompile Include="PacketStringTokenizerTests.cpp" />
     <ClCompile Include="PacketProcessorTests.cpp" />

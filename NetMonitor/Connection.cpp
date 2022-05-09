@@ -1,39 +1,6 @@
 #include "NetMonitorState.h"
 
-Connection::Connection(IpPacket* packet)
-{
-	ipVersion = packet->ipVersion;
 
-	localNetworkAddress = packet->GetLocalNetworkAddress();
-	remoteNetworkAddress = packet->GetRemoteNetworkAddress();
-
-	txBytes = 0;
-	rxBytes = 0;
-	lastTx = std::chrono::system_clock::now();
-	lastRx = std::chrono::system_clock::now();
-	rxRate = 0;
-	txRate = 0;
-
-	UpdateBytes(*packet);
-
-	transportProtocol = packet->transportProtocol;
-	data = packet->GetData();
-	auto localProto = Protocol::GetProtocol(transportProtocol, localNetworkAddress.port);
-	auto remoteProto = Protocol::GetProtocol(transportProtocol, remoteNetworkAddress.port);
-
-	if (localProto != Protocol::ProtoEnum::Other)
-	{
-		protocol = localProto;
-	}
-	else if (remoteProto != Protocol::ProtoEnum::Other)
-	{
-		protocol = remoteProto;
-	}
-	else
-	{
-		protocol = Protocol::ProtoEnum::Other;
-	}
-}
 
 void Connection::UpdateConnection(IpPacket* packet)
 {

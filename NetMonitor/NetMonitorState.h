@@ -38,7 +38,6 @@ public:
 	{
 	}
 
-	Connection(IpPacket* packet);
 	virtual void UpdateConnection(IpPacket* packet);
 	std::string Serialize();
 	double Getkbs(std::chrono::time_point<std::chrono::system_clock> lastRx, int packetLength);

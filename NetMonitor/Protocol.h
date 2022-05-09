@@ -49,8 +49,10 @@ public:
 	enum class ProtoEnum
 	{
 		HTTPS,
+		NetBIOS,
 		DNS,
 		SMB,
+		SSDP,
 		QUIC,
 		RPC,
 		RDP,
@@ -103,6 +105,17 @@ public:
 			return "QUIC";
 		case Protocol::ProtoEnum::RPC:
 			return "RPC";
+		case Protocol::ProtoEnum::RDP:
+			return "RDP";
+		case Protocol::ProtoEnum::NetBIOS:
+			return "NetBIOS";
+		case Protocol::ProtoEnum::SSDP:
+			return "SSDP";
+		case Protocol::ProtoEnum::MSSQL:
+			return "MSSQL";
+		case Protocol::ProtoEnum::WINRM:
+			return "WINRM";
+
 		default:
 			break;
 		}

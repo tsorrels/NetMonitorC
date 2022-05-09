@@ -20,7 +20,7 @@ void HomeDisplayTab::UpdateTabDisplay(DisplayState* display, NetMonitorState* st
 	// Column headers
 	wattron(window, A_UNDERLINE);
 	std::string columnHeadersString = "IPVer  RemoteIp                             Rx       Tx PROTO SrcPort DstPort PROTO Kb/s";
-	mvwaddstr(window, currentLine, 0, columnHeadersString.c_str());
+	mvwaddstr(window, currentLine, 0, NetMonitorDisplay::FormatLine(columnHeadersString, numScreenColumns).c_str());
 	wattrset(window, A_NORMAL);
 	currentLine++;
 

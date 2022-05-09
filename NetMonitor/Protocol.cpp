@@ -14,5 +14,7 @@ std::map<int, Protocol::ProtoEnum> Protocol::tcpProtocolMap = {
 
 std::map<int, Protocol::ProtoEnum> Protocol::udpProtocolMap = {
 	{443, Protocol::ProtoEnum::QUIC},
-	{53, Protocol::ProtoEnum::DNS}
+	{53, Protocol::ProtoEnum::DNS},
+	{3389, Protocol::ProtoEnum::RDP},
+	{1900, Protocol::ProtoEnum::SSDP}
 };
